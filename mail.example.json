@@ -1,0 +1,31 @@
+{
+	"smtp": {
+    "host": "company.web",
+    "secure": true,
+    "port": 465,
+    "auth": {
+        "user": "info@company.web",
+        "pass": "password"
+    }
+  },
+  "template": {
+		"Registration": {
+			"Text": "Hi,\n\nThanks for creating an account with Hyperyun.com. Click below to confirm your email address:\n{{activationLink}}\n\nIf you have problems, please paste the above URL into your web browser. \n\nThanks,\nCompany.web Team",
+			"HTML": "Hi,<br>\n<br>\nThanks for creating an account with Hyperyun.com. Click below to confirm your email address:<br>\n<a href='{{activationLink}}'>{{activationLink}}</a> <br>\n<br>\nIf you have problems, please paste the above URL into your web browser. <br>\n<br>\nThanks,<br>\nCompany.web Team",
+			"from": "info@company.com",
+			"title": "Welcome to Company.web"
+		},
+		"Activation": {
+			"Text": "Hi,\n\nThank you for confirming your email. We hope you'll enjoy Hyperyun.com.\n\nThanks,\nyperyun.com Team",
+			"HTML": "Hi,<br>\n<br>\nThank you for confirming your email. We hope you'll enjoy Hyperyun.com.<br>\n<br>\nThanks,<br>\nCompany.web Team",
+			"from": "info@company.com",
+			"title": "Company.web Activation"
+		},
+		"Password Recovery": {
+			"Text": "If you made this request, and you need your password reset, please go to the following URL to confirm your request and change the password to the new one:\n\n{{forgotPasswordLink}}\n\nNote: this URL can only be used to change your password once.\n\nPlease disregard this message if you did not request this change. Your password will not be changed.\n\nThanks,\nCompany.web Team",
+			"HTML": "If you made this request, and you need your password reset, please go to the following URL to confirm your request and change the password to the new one:<br>\n<br>\n<a href='{{forgotPasswordLink}}'>{{forgotPasswordLink}}</a> <br>\n<br>\nNote: this URL can only be used to change your password once.<br>\n<br>\nPlease disregard this message if you did not request this change. Your password will not be changed.<br>\n<br>\nThanks,<br>\nCompany.web Team",
+			"from": "info@company.com",
+			"title": "Company.web - Password Recovery"
+		}
+	}
+}

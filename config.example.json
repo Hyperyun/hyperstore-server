@@ -1,0 +1,11 @@
+{
+	"company": "MyCompany",
+	"url": "company.web",
+	"database": {
+		"server": "localhost",
+		"name": "mydb",
+		"port": "27017"
+	},
+	"port": "80",
+	"application": "myApp",
+}

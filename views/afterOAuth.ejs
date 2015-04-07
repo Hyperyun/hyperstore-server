@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">	
+	<title>Hyperyun OAuth</title>
+ 	<script type="text/javascript" src="/js/socket.io.js"></script>
+ 	<style type="text/css">
+	#nopage {
+		padding-top: 50px;
+		padding-bottom: 70px;
+		text-align: center;
+		border-bottom: 6px solid #fe781e;
+	}
+
+	.link {
+		color:#fe781e;
+	}
+
+	.link:hover {
+		color:#e66d1c;
+	}
+	</style>
+</head>
+<body>
+<div id="nopage">
+    <% if(token) { %>
+        <h1><%= __('Authorization Succesful') %></h1>
+    <% } else { %>
+        <h1><%= __('Authorization Faild') %></h1>
+        <p class="lead"><%= err %></p>
+    <% } %>
+</div>
+<script type="text/javascript">
+	var socket = io.connect('http://<%= host %>');
+	<% if(token) { %>
+	var data = {socket: "<%= socket %>", token: "<%= token.token %>", expires: "<%= token.expires %>", method: "<%= method %>"};
+	console.log(data);
+	socket.emit('afterOAuth', data, function(){
+		window.close();
+	});
+    <% } else { %>
+    socket.emit('afterOAuth', false, function(){
+		window.close();
+	});
+    <% } %>
+</script>
+</body>
+</html>

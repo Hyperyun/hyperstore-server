@@ -1,0 +1,15 @@
+<p>Hi <%= username %>!</p>
+<p><b><%= client_id %></b> is requesting access to your account.</p>
+<p>Do you approve?</p>
+
+<form action="/oauth2/redirect" method="get">
+  <input name="user_id" type="hidden" value="<%= user_id %>">
+  <input name="client_id" type="hidden" value="<%= client_id %>">
+  <input name="state" type="hidden" value="<%= state %>">
+  <input name="scope" type="hidden" value="<%= scope %>">
+  <input name="statedURI" type="hidden" value="<%= statedURI %>">
+  <div>
+  <input type="submit" value="Allow" name="allow" id="allow">
+  <input type="submit" value="Deny" name="allow" id="deny">
+  </div>
+</form>
