@@ -14,6 +14,7 @@
     "MD5": "~1.2.1",
     "async": "*",
     "body-parser": "*",
+    "bcrypt": "*",
     "commander": "^2.7.1",
     "compression": "*",
     "connect": "*",
