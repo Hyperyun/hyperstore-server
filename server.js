@@ -3139,6 +3139,7 @@ if(config.application && program.email && program.password && !config.baas) {
 			password: program.password,
 		}
 	}
+	console.log(application);
 	Hyperyun.Hyperstore.createApp(application, function(res) {
 		if(res.err) throw res.err;
 	});
