@@ -30,20 +30,22 @@ var program = require('commander');
 
 program
   .version('0.0.1')
-  .option('-c, --company', 'Company name')
-  .option('-u, --url', 'Server url')
-  .option('-P, --port', 'Server port')
-  .option('-a, --application', 'Application name')
-  .option('-e, --email', 'Email for admin user (first run)')
-  .option('-p, --password', 'Password for admin user (first run)')
-  .option('-l, --delimiter', 'Database delimiter to use (default: "~")')
+  .option('-c, --company [value]', 'Company name')
+  .option('-u, --url [value]', 'Server url')
+  .option('-P, --port [value]', 'Server port')
+  .option('-a, --application [value]', 'Application name')
+  .option('-e, --email [value]', 'Email for admin user (first run)')
+  .option('-p, --password [value]', 'Password for admin user (first run)')
+  .option('-l, --delimiter [value]', 'Database delimiter to use (default: "~")')
   .option('-M, --multi', 'Run in Multi-tenancy mode')
-  .option('-d, --database', 'Path to MongoDB (default: "mongodb://localhost:27017/hyperstore")')
-  .option('-s, --database-server', 'MongoDB server (default: "localhost")')
-  .option('-n, --database-name', 'Name of MongoDB database (default: "hyperstore")')
-  .option('-D, --database-port', 'Port for MongoDB server (default: "27017")')
-  .option('-C, --config', 'Path to configuration JSON file')
+  .option('-d, --database [value]', 'Path to MongoDB (default: "mongodb://localhost:27017/hyperstore")')
+  .option('-s, --database-server [value]', 'MongoDB server (default: "localhost")')
+  .option('-n, --database-name [value]', 'Name of MongoDB database (default: "hyperstore")')
+  .option('-D, --database-port [value]', 'Port for MongoDB server (default: "27017")')
+  .option('-C, --config [value]', 'Path to configuration JSON file')
   .parse(process.argv);
+
+console.log(program);
 
 var configFile = {};
 if(fs.existsSync(program.config || './config.json')) configFile = require(program.config || './config.json');
