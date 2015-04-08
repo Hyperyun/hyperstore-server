@@ -45,8 +45,8 @@ program
   .option('-C, --config', 'Path to configuration JSON file')
   .parse(process.argv);
 
-
-var configFile = require(program.config ? program.config : './config.json');
+var configFile = {};
+if(fs.existsSync(program.config || './config.json')) configFile = require(program.config || './config.json');
 
 if(program.database) var mongoUri = program.database;
 else if(program.databaseServer) var mongoUri = "mongodb://"+program.databaseServer+":"+(program.databasePort || "27017")+"/"+(program.databaseName || "hyperstore");
@@ -332,6 +332,7 @@ Hyperyun.Mailer.sendMail = function(appName, templateName, user, socket, callbac
 	Hyperyun.Hyperstore.collections[appName+dlim+company+"Configuration"].db.findOne({url:appName},function(err, app){
 		Hyperyun.Hyperstore.collections[collection].db.findOne({template: templateName}, function(err, template) {
 			if(sendAsAdmin) {
+				if(!fs.existsSync('./mail.json')) throw "No email settings for admin in mail.json";
 				var adminMail = require('./mail.json');
 				app = {smtp: adminMail.smtp};
 				template = adminMail.template[templateName];
