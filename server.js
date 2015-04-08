@@ -65,7 +65,7 @@ var config = {
 	port: (program.port || configFile.port || process.env.PORT || 80),
 	database: mongoUri,
 	dlim : (program.delimiter || configFile.delimiter || "~"),
-	application : (program.application || configFile.application || "MyApp"),
+	application : (program.application || configFile.application || "myapplication"),
 	mulit: (program.mulit || configFile.mulit || false)
 }
 
