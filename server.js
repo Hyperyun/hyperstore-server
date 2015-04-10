@@ -36,7 +36,6 @@ program
   .option('-a, --application [value]', 'Application name')
   .option('-e, --email [value]', 'Email for admin user (first run)')
   .option('-p, --password [value]', 'Password for admin user (first run)')
-  .option('-l, --delimiter [value]', 'Database delimiter to use (default: "~")')
   .option('-M, --multi', 'Run in Multi-tenancy mode')
   .option('-d, --database [value]', 'Path to MongoDB (default: "mongodb://localhost:27017/hyperstore")')
   .option('-s, --database-server [value]', 'MongoDB server (default: "localhost")')
@@ -64,7 +63,6 @@ var config = {
 	companyURL: (program.url || configFile.url || "hyperyun.com"),
 	port: (program.port || configFile.port || process.env.PORT || 80),
 	database: mongoUri,
-	dlim : (program.delimiter || configFile.delimiter || "~"),
 	application : (program.application || configFile.application || "myapplication"),
 	mulit: (program.mulit || configFile.mulit || false)
 }
@@ -122,7 +120,7 @@ var companyCapitalized = config.companyCapitalized;
 var companyApp = config.companyApp;
 var companyURL = config.url;
 
-var dlim = config.dlim || "~";
+var dlim = "~";
 
 /***
  *    ██████╗  █████╗  ██████╗██╗  ██╗██╗    ██╗██╗██████╗ ███████╗
@@ -1029,15 +1027,17 @@ Hyperyun.Access.broadcastAccess = function(access, doc){
 		var socketsToBroadcast = [];
 		_.forEach(activeQueries,function(activeQuery){
 			socketsToBroadcast = _.union(Hyperyun.Hyperstore.active_queries[activeQuery].subscribers, socketsToBroadcast);
-		})
+		});
 		_.forEach(socketsToBroadcast, function(socket_id){
 			Hyperyun.Access.notifySocketSubscriber(socket_id, access);
-		})
+		});
 	}
 }
 
 Hyperyun.Access.notifySocketSubscriber = function(socket_id, access){
-	var event = Hyperyun.constants.emitEvents[access.event]
+	var event = Hyperyun.constants.emitEvents[access.event];
+	Hyperyun.Debug.eddy("notifySocketSubscriber: "+"/"+access.full_coll+ ", "+socket_id);
+	Hyperyun.Debug.eddy(io.of("/"+access.full_coll).connected);
 	var socket = io.of("/"+access.full_coll).connected[socket_id];
 	if(!socket || !event)
 	{
@@ -3132,7 +3132,7 @@ io.sockets.on('connection', function (socket, data) {
 
 // Make first app 
 
-if(config.application && program.email && program.password && !config.baas) {
+if(config.application && program.email && program.password && !config.multi) {
 	var application = {
 		name: config.application,
 		url: config.application, 
