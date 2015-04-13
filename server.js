@@ -85,12 +85,14 @@ app.use(function(req,res,next){
 
 app.use(cookieParser());
 // all environments
-app.set('views', __dirname + '/views');
+app.set('views', __dirname);
 app.set('view engine', 'ejs');
 app.use(morgan('dev'));
 app.use(bodyParser());
 app.use(methodOverride());
 app.use(compression());
+
+if (fs.lstatSync('commander/').isDirectory()) app.use("/commander", express.static(__dirname + "/commander"));
 
 	//Writte allow cross-domain access
 var io = require('socket.io')(server,{
@@ -2880,7 +2882,7 @@ if(config.multi) require('./Multitenant/multitenant.js')(Hyperyun, app, config);
 
 //user login dialog. Upon successful login, sends user to the decision dialog
 app.get('/dialog/login', function(req, res){
-	res.render('oauthLogin', {client_id: req.query.client_id, state: req.query.state, scope: req.query.scope, statedURI: req.query.redirect_uri});
+	res.render('views/oauthLogin', {client_id: req.query.client_id, state: req.query.state, scope: req.query.scope, statedURI: req.query.redirect_uri});
 })
 
 //user decision dialog. Upon allowing, the user will be sent to the redirect
@@ -2895,7 +2897,7 @@ app.post('/dialog/decision', function(req, res){
 					if(!err && response)
 					{
 						var userid = doc._id;
-						res.render('oauthDecision', {
+						res.render('views/oauthDecision', {
 							username: req.body.username,
 							clientname: req.body.client_id,
 							client_id: req.body.client_id,
@@ -2911,7 +2913,7 @@ app.post('/dialog/decision', function(req, res){
 	});
 })
 app.get('/debugRedirect', function(req,res){
-	res.render('debug',{code: req.query.code, client_id:"12345b", client_secret:"secret"})
+	res.render('views/debug',{code: req.query.code, client_id:"12345b", client_secret:"secret"})
 })
 //will send the user to the redirect location with the auth code
 app.get('/oauth2/redirect', function(req, res){
@@ -2940,12 +2942,14 @@ app.post('/oauth2/grant', Hyperyun.OAuth.assureOAuth, function(req, res){
 app.get('/admin', function(req, res) {
 	if(config.multi) {
 		if(req.subdomains.length>0) {
-			res.render('admin', {page: null, appName: req.subdomains[0]});
+			if(!fs.existsSync(__dirname + "/commander/index.ejs")) res.send("Error: commander not installed.");
+			else res.render('commander/index', {host: req.header('host'), appName: req.subdomains[0]});
 		} else {
 			res.redirect('/login');
 		}
 	} else if(config.application) {
-		res.render('admin', {page: null, appName: config.application});
+		if(!fs.existsSync(__dirname + "/commander/index.ejs")) res.send("Error: commander not installed.");
+		else res.render('commander/index', {host: req.header('host'), appName: config.application});
 	} else res.redirect('/');  
 });
 // Add support for admin clientside routing
@@ -2953,12 +2957,14 @@ app.get('/admin', function(req, res) {
 app.get('/admin/:page', function(req, res) {
 	if(config.multi) {
 		if(req.subdomains.length>0) {
-			res.render('admin', {page: req.params.page, appName: req.subdomains[0]});
+			if(!fs.existsSync(__dirname + "/commander/index.ejs")) res.send("Error: commander not installed.");
+			else res.render('commander/index', {host: req.header('host'), appName: req.subdomains[0]});
 		} else {
 			res.redirect('/login');
 		}
 	} else if(config.application) {
-		res.render('admin', {page: req.params.page, appName: config.application});
+		if(!fs.existsSync(__dirname + "/commander/index.ejs")) res.send("Error: commander not installed.");
+		else res.render('commander/index', {host: req.header('host'), appName: config.application});
 	} else res.redirect('/'); 
 });
 
@@ -2968,20 +2974,20 @@ app.get('/activate/:code', function(req, res) {
 		if(req.subdomains.length>0) {
 			Hyperyun.Accounts.activateAccount(req.subdomains[0], req.params.code, function(response){
 				if(response.url) res.redirect(response.url);
-				else if(response.err) res.render('activateError');
-				else res.render('activateSuccess');
+				else if(response.err) res.render('views/activateError');
+				else res.render('views/activateSuccess');
 			});
 		} else {
 			Hyperyun.Multitenant.activate(req.params.code, function(response) {
-				if(response.err) res.render('activateError');
-				else res.render('activateSuccess');
+				if(response.err) res.render('views/activateError');
+				else res.render('views/activateSuccess');
 			});
 		}
 	} else if(config.application){
 		Hyperyun.Accounts.activateAccount(config.application, req.params.code, function(response){
 			if(response.url) res.redirect(response.url);
-			else if(response.err) res.render('activateError');
-			else res.render('activateSuccess');
+			else if(response.err) res.render('views/activateError');
+			else res.render('views/activateSuccess');
 		});
 	} else res.redirect('/');
 });
@@ -2991,8 +2997,8 @@ app.get('/forgot/:code', function(req, res) {
 	else if(config.application) appName = config.application;
 	if(appName) {
 		Hyperyun.Accounts.forgotPassword(appName, req.params.code, function(exists){
-			if(exists) res.render('forgot', {code: req.params.code});
-			else res.render('forgotError');
+			if(exists) res.render('views/forgot', {code: req.params.code});
+			else res.render('views/forgotError');
 		});
 	} else res.redirect('/');
 });
@@ -3052,8 +3058,8 @@ app.get('/auth/:provider/:oauthtype/', function(req, res){
 	else if(config.application) appName = config.application;
 
 	Hyperyun.OAuth.auth(req.params.oauthtype, req.params.provider, req.query.code, appName, function(token, err){
-		if(token) res.render('afterOAuth', {socket: req.params.socket, token: token, method: req.params.provider});
-		else res.render('afterOAuth', {token: false, err: err});
+		if(token) res.render('views/afterOAuth', {socket: req.params.socket, token: token, method: req.params.provider});
+		else res.render('views/afterOAuth', {token: false, err: err});
 	});
 });
 
@@ -3061,14 +3067,14 @@ app.get('/auth/:provider/:oauthtype/:id/:socket', function(req, res){
 	if(req.params.oauthtype=="oauth2") {
 		var redirect_uri = "http://"+req.host+req.path;
 		Hyperyun.OAuth.auth2(req.params.provider, req.query.code, req.params.id, {redirect_uri: redirect_uri}, function(token, err){
-	    	if(token) res.render('afterOAuth', {socket: req.params.socket, token: token, method: req.params.provider});
-	    	else res.render('afterOAuth', {token: false, err: err});
+	    	if(token) res.render('views/afterOAuth', {socket: req.params.socket, token: token, method: req.params.provider});
+	    	else res.render('views/afterOAuth', {token: false, err: err});
 	    });
 	} else {
 		var redirect_uri = "http://"+req.host+req.path;
 		Hyperyun.OAuth.auth1(req.params.oauthtype, req.params.provider, req.query.code, req.params.id, {redirect_uri: redirect_uri}, function(token, err){
-	    	if(token) res.render('afterOAuth', {socket: req.params.socket, token: token, method: req.params.provider});
-	    	else res.render('afterOAuth', {token: false, err: err});
+	    	if(token) res.render('views/afterOAuth', {socket: req.params.socket, token: token, method: req.params.provider});
+	    	else res.render('views/afterOAuth', {token: false, err: err});
 	    });
 	}
 });
@@ -3078,7 +3084,7 @@ app.get('/cdn/:file',function(req,res){
 })
 
 app.get('/', function(req, res) {
-	res.render('index');
+	res.render('views/index');
 });
 
 app.get(/^\/(.*)/, function(req, res) {
